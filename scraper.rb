@@ -5,7 +5,16 @@ require_relative "comment"
 require_relative "post"
 
 website = ARGV[0]
+begin
 @doc = Nokogiri::HTML(open(website))
+rescue
+  puts "Invalid URL"
+end
+
+
+
+
+
 
 ##### ------- Scrap Helper Methods ------------- ######
 def grab_text(arr)
@@ -24,6 +33,12 @@ def populate_comments
   return commentarr
 end
 
+
+
+
+
+
+
 #### ------- Comment Information Scrape ------------- ######
 def get_statement
   statement = grab_text(@doc.xpath("//td/table[2]//span[contains(@class, 'comment')]"))
@@ -37,6 +52,12 @@ end
 def get_comments
   all_comments = get_names.zip(get_statement,get_dates)
 end
+
+
+
+
+
+
 
 ##### ------- Post Information Scrape ------------- ######
 def get_title
@@ -57,6 +78,12 @@ end
 def get_item_id
   (@doc.xpath("//td/table[1]//td[contains(@class, 'subtext')]/a[2]/@href")).text().delete("^0-9").to_i
 end
+
+
+
+
+
+
 ####### ---------------- Content Generation ------------------- ########
 def make_post
   post = Post.new(get_title, get_url, get_points, get_item_id, get_author, get_date_authored)
@@ -70,10 +97,10 @@ end
 
 def comments_by_author(post)
   comments = []
-  @comments.each do |comment|
+  post.comments.each do |comment|
     if comment.author_name == post.author
-      comments << comment
+      comments << comment.statement
     end
   end
-  return comments
+  comments
 end
