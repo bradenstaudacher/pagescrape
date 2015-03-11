@@ -7,7 +7,7 @@ require_relative "post"
 website = ARGV[0]
 @doc = Nokogiri::HTML(open(website))
 
-##### ------- Node to Text array builder ------------- ######
+##### ------- Scrap Helper Methods ------------- ######
 def grab_text(arr)
 array_of_blank = []
   arr.each do |content|
@@ -57,7 +57,7 @@ end
 def get_item_id
   (@doc.xpath("//td/table[1]//td[contains(@class, 'subtext')]/a[2]/@href")).text().delete("^0-9").to_i
 end
-
+####### ---------------- Content Generation ------------------- ########
 def make_post
   post = Post.new(get_title, get_url, get_points, get_item_id, get_author, get_date_authored)
   add_comments_to_post(post)
@@ -68,6 +68,12 @@ def add_comments_to_post(post)
   post.add_all_comments(populate_comments)
 end
 
-make_post
-
-binding.pry
+def comments_by_author(post)
+  comments = []
+  @comments.each do |comment|
+    if comment.author_name == post.author
+      comments << comment
+    end
+  end
+  return comments
+end
